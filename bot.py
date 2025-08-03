@@ -12,7 +12,7 @@ temp_data = {}
 
 # Step states
 steps = [
-    'phone', 'fio', 'pasport', 'jshshir', 'tugulgan_sana', 'jinsi', 'manzili', 'talim_muassasasi', 'rasm'
+    'phone', 'fio', 'pasport_seria_id', 'jshshir', 'tugulgan_sana', 'jinsi', 'manzili', 'talim_muassasasi', 'rasm'
 ]
 
 @bot.message_handler(commands=['start'])
@@ -35,7 +35,7 @@ def contact_handler(message):
 
     temp_data[chat_id]['phone'] = message.contact.phone_number
     user_states[chat_id] = 'fio'
-    bot.send_message(chat_id, "F.I.O ni kiriting:")
+    bot.send_message(chat_id, "F.I.SH ni kiriting:")
 
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
@@ -47,22 +47,14 @@ def text_handler(message):
 
     temp_data[chat_id][state] = message.text.strip()
 
-    # Pasport bo'yicha tekshirish
-    if state == 'pasport':
-        if passport_exists(message.text.strip()):
-            user = get_user_by_passport(message.text.strip())
-            send_download_button(chat_id, user['pasport'])
-            user_states.pop(chat_id, None)
-            temp_data.pop(chat_id, None)
-            return
-
     next_index = steps.index(state) + 1
     if next_index < len(steps):
         next_state = steps[next_index]
         user_states[chat_id] = next_state
 
         questions = {
-            'jshshir': "JSHSHIRni kiriting:",
+            'jshshir': "JSHSHIR:",
+            'pasport_seria_id':"Passport Seria Id",
             'tugulgan_sana': "Tug'ilgan sanani kiriting misol(2000-10-25):",
             'jinsi': "Jinsingiz (erkak/ayol):",
             'manzili': "Yashash manzilingiz (passportdagi):",
@@ -93,7 +85,7 @@ def photo_handler(message):
 
     # Ma'lumotlarni bazaga yozish
     save_user(temp_data[chat_id])
-    pasport = temp_data[chat_id]['pasport']
+    pasport = temp_data[chat_id]['pasport_seria_id']
 
     bot.send_message(chat_id, "Ma'lumotlaringiz saqlandi.")
     send_download_button(chat_id, pasport)
